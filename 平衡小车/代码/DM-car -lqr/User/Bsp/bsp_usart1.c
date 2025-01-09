@@ -14,7 +14,7 @@ void connect_usart1_init(void)
 	 HAL_UARTEx_ReceiveToIdle_DMA(&huart1, rev_data.rx,RECEIVE_DATA_SIZE*2);	
 }
 
-
+float vel_ratio=0.05f;
 extern chassis_t chassis_move;
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -42,23 +42,26 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			{
 				chassis_move.front_flag=1;
 
-				chassis_move.v_set=1.5f;				
+				//chassis_move.v_set=2.0f;	
+				chassis_move.v_set=65.0f*vel_ratio;
+				chassis_move.x_set=chassis_move.x_set+chassis_move.v_set*0.02f;				
 			}
 			else if(rev_data.rx[0]=='E')
 			{
 				chassis_move.front_flag=1;
-
-				chassis_move.v_set=-1.5f;
+				//chassis_move.v_set=-2.0f;
+			  chassis_move.v_set=-65.0f*vel_ratio;
+				chassis_move.x_set=chassis_move.x_set+chassis_move.v_set*0.02f;				
 			}
 			else if(rev_data.rx[0]=='G')
 			{
 				chassis_move.turn_flag=1;
-				chassis_move.turn_set=6.0f;
+				chassis_move.turn_set=4.5f;
 			}
 			else if(rev_data.rx[0]=='C')
 			{
 				chassis_move.turn_flag=1;
-				chassis_move.turn_set=-6.0f;
+				chassis_move.turn_set=-4.5f;
 			}
 		//	else if(rev_data.rx[0]=='F')
 			//{

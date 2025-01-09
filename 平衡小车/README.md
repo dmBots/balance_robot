@@ -9,10 +9,9 @@
 
 如果该项目对您有帮助，可以点点右上角的star。
 
-#### 软件架构
+#### 实物视频演示
 
-` test `
-
+[https://www.bilibili.com/video/BV1RKmNYcE5o/?spm_id_from=333.1387.homepage.video_card.click](https://www.bilibili.com/video/BV1RKmNYcE5o/?spm_id_from=333.1387.homepage.video_card.click)
 
 #### 安装教程
 

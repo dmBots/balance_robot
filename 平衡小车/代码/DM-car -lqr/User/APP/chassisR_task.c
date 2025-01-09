@@ -47,8 +47,11 @@ float Turn(float Angle,float Gyro)
 }
 
 float turn_T=0.0f;
-float lqr_k[2][4]={   {-0.0146f ,  -0.1005f,   -0.6029f ,  -0.0279f},
-   {-0.0146f  , -0.1005f  , -0.6029f,   -0.0279f}};
+
+//float lqr_k[2][4]={    { -0.0060f  , -0.0628f  , -0.7354f   ,-0.0659f},
+//   {-0.0060f ,  -0.0628f , -0.7354f  , -0.0659f}};
+float lqr_k[2][4]={    {-0.0060f   , -0.0613f    ,-0.6800f ,   -0.0656f} ,
+   {-0.0060f  ,  -0.0613f  ,  -0.6800f  ,  -0.0656f}};
 void ChassisR_task(void)
 {
 	while(INS.ins_flag==0)
@@ -62,22 +65,22 @@ void ChassisR_task(void)
 	{	
 		chassisR_feedback_update(&chassis_move,&INS);//更新数据
 							
-    chassis_move.wheel_motor[0].wheel_T=//lqr_k[0][0]*(chassis_move.x_set-chassis_move.x)
-																				+lqr_k[0][1]*(chassis_move.v_set-chassis_move.v)
+    chassis_move.wheel_motor[0].wheel_T=lqr_k[0][0]*(chassis_move.x_set-chassis_move.x)
+																				+lqr_k[0][1]*(0.5f*chassis_move.v_set-chassis_move.v)
 																				+lqr_k[0][2]*(0.05f-chassis_move.myPithR)//0.05rad是机械中值
 																				+lqr_k[0][3]*(chassis_move.d_phi_set-chassis_move.myPithGyroR);
 		
-		chassis_move.wheel_motor[1].wheel_T=//lqr_k[1][0]*(chassis_move.x_set-chassis_move.x)
-																				+lqr_k[1][1]*(chassis_move.v_set-chassis_move.v)
+		chassis_move.wheel_motor[1].wheel_T=lqr_k[1][0]*(chassis_move.x_set-chassis_move.x)
+																				+lqr_k[1][1]*(0.5f*chassis_move.v_set-chassis_move.v)
 																				+lqr_k[1][2]*(0.05f-chassis_move.myPithR)
 																				+lqr_k[1][3]*(chassis_move.d_phi_set-chassis_move.myPithGyroR);
 		
-		chassis_move.wheel_motor[1].wheel_T=0.0f-chassis_move.wheel_motor[1].wheel_T;
+		chassis_move.wheel_motor[0].wheel_T=0.0f-chassis_move.wheel_motor[0].wheel_T;
 		
 		turn_T= Turn(chassis_move.total_yaw,INS.Gyro[2]);
 		
-		chassis_move.wheel_motor[0].wheel_T=chassis_move.wheel_motor[0].wheel_T+turn_T;
-		chassis_move.wheel_motor[1].wheel_T=chassis_move.wheel_motor[1].wheel_T+turn_T;
+		chassis_move.wheel_motor[0].wheel_T=chassis_move.wheel_motor[0].wheel_T-turn_T;
+		chassis_move.wheel_motor[1].wheel_T=chassis_move.wheel_motor[1].wheel_T-turn_T;
 
 		mySaturate(&chassis_move.wheel_motor[0].wheel_T,-0.18f,0.18f);
 		mySaturate(&chassis_move.wheel_motor[1].wheel_T,-0.18f,0.18f);
@@ -124,7 +127,7 @@ void chassisR_feedback_update(chassis_t *chassis,INS_t *ins)
 	chassis->myPithGyroR=ins->Gyro[1];
 	
 	chassis->total_yaw=ins->YawTotalAngle;
-	chassis->v=((chassis->wheel_motor[0].para.vel-chassis->wheel_motor[1].para.vel)/2.0f)*0.03375f;//0.03375m是轮子半径
+	chassis->v=((chassis->wheel_motor[1].para.vel-chassis->wheel_motor[0].para.vel)/2.0f)*0.03375f;//0.03375m是轮子半径
 	chassis->x=chassis->x+chassis->v*0.001f;//控制周期为1ms
 	
 	if(chassis_move.wheel_motor[0].para.vel>180.0f||chassis_move.wheel_motor[0].para.vel<-180.0f
