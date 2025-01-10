@@ -56,14 +56,14 @@ float roll_kd=1.0f;
 
 int jump_time;
 int finish_time;
-float Poly_Coefficient[8][4]={{6.4358e-12, -1.3607e-12, 8.281e-14, -0.045644},
-{65.7024, -19.6556, 2.0915, -0.17954},
-{-57.4377, 20.4781, -3.2533, -0.67796},
-{9.3412, -2.9022, 0.075417, -0.038309},
-{6.2982e-12, -1.3217e-12, 7.7894e-14, -0.045644},
-{65.7024, -19.6556, 2.0915, -0.17954},
-{-57.4377, 20.4781, -3.2533, -0.67796},
-{9.3412, -2.9022, 0.075417, -0.038309}
+float Poly_Coefficient[8][4]={{3.515e-12, -7.2537e-13, 4.388e-14, -0.010351},
+{26.7451, -7.9462, 0.83722, -0.087871},
+{-65.1454, 23.0838, -3.4635, -0.6282},
+{4.0412, -1.3881, 0.028802, -0.06891},
+{3.4115e-12, -7.2121e-13, 4.481e-14, -0.010351},
+{26.7451, -7.9462, 0.83722, -0.087871},
+{-65.1454, 23.0838, -3.4635, -0.6282},
+{4.0412, -1.3881, 0.028802, -0.06891}
 };
 
 float LQR_K_calc(float *coe,float len)
@@ -72,11 +72,10 @@ float LQR_K_calc(float *coe,float len)
 }
 
 
-//float lqr_k[8]={ -0.1054f ,  -0.1513f ,  -0.6841f,   -0.0414f,
-//   -0.1054f,   -0.1513f,   -0.6841f,   -0.0414f};
 float lqr_k[8]={ 
-   -0.0456,   -0.1156 ,  -0.7968 ,  -0.0406,
-   -0.0456,   -0.1156,   -0.7968 ,  -0.0406};
+        -0.0104f ,  -0.0624f  , -0.7520f,   -0.0704f,
+   -0.0104f,   -0.0624f,   -0.7520f,   -0.0704f
+};
 void ChassisR_task(void)
 {
 	while(INS.ins_flag==0)
@@ -112,12 +111,12 @@ void ChassisR_task(void)
 																		+lqr_k[7]*(chassis_move.d_phi_set-chassis_move.myPithGyroR);
 	
 	
-		chassis_move.wheel_motor[1].wheel_T=0.0f-chassis_move.wheel_motor[1].wheel_T;
+		chassis_move.wheel_motor[0].wheel_T=0.0f-chassis_move.wheel_motor[0].wheel_T;
 		
 		turn_T= Turn(chassis_move.total_yaw,INS.Gyro[2]);
 		
-		chassis_move.wheel_motor[0].wheel_T=chassis_move.wheel_motor[0].wheel_T+turn_T;
-		chassis_move.wheel_motor[1].wheel_T=chassis_move.wheel_motor[1].wheel_T+turn_T;
+		chassis_move.wheel_motor[0].wheel_T=chassis_move.wheel_motor[0].wheel_T-turn_T;
+		chassis_move.wheel_motor[1].wheel_T=chassis_move.wheel_motor[1].wheel_T-turn_T;
 		
 		mySaturate(&chassis_move.wheel_motor[0].wheel_T,-0.18f,0.18f);
 		mySaturate(&chassis_move.wheel_motor[1].wheel_T,-0.18f,0.18f);
@@ -296,8 +295,8 @@ void chassisR_feedback_update(chassis_t *chassis,INS_t *ins,vmc_leg_t *vmc_leg)
 	chassis->myPithGyroR=0.0f-ins->Gyro[1];
 	
 	chassis->total_yaw=ins->YawTotalAngle;
-	chassis->v_act=((chassis->wheel_motor[0].para.vel-chassis->wheel_motor[1].para.vel)/2.0f)*0.03375f;//0.03375m是轮子半径
-	//chassis->v=((chassis->wheel_motor[0].para.vel-chassis->wheel_motor[1].para.vel)/2.0f)*0.03375f;//0.03375m是轮子半径
+	chassis->v_act=((chassis->wheel_motor[1].para.vel-chassis->wheel_motor[0].para.vel)/2.0f)*0.03375f;//0.03375m是轮子半径
+	//chassis->v=((chassis->wheel_motor[1].para.vel-chassis->wheel_motor[0].para.vel)/2.0f)*0.03375f;//0.03375m是轮子半径
 	averr[0]=averr[1];
 	averr[1]=averr[2];
 	averr[2]=averr[3];

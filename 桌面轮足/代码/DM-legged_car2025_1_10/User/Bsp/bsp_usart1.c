@@ -30,7 +30,7 @@ void connect_usart1_init(void)
 }
 
 
-float vel_ratio=-0.007f;
+float vel_ratio=-0.008f;
 float turn_ratio=0.02f;
 float turn_ratio2=0.09f;
 float leg_ratio=0.00006f;
@@ -121,7 +121,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			&&((chassis_move.myPithR<((-3.1415926f)/4.0f)&&chassis_move.myPithR>((-3.1415926f)/2.0f))
 		  ||(chassis_move.myPithR>(3.1415926f/4.0f)&&chassis_move.myPithR<(3.1415926f/2.0f))))
 			{
-			 chassis_move.recover_flag=1;//需要自起
+			  chassis_move.recover_flag=1;//需要自起
 				chassis_move.leg_set=0.05f;//原始腿长
 			}
 			
